@@ -1,9 +1,10 @@
-import {Button} from "react-bootstrap";
+import { Button, Container, OverlayTrigger, Tooltip } from "react-bootstrap";
 import React, { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { BASE_URL } from "../../config";
 import { IMenu } from "../../models/Menu";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 interface Props {}
 
 export default function Platos(props: Props): ReactElement {
@@ -19,7 +20,7 @@ export default function Platos(props: Props): ReactElement {
       .catch((err) => console.error(err));
   }, []);
   return (
-    <div className="container pt-3">
+    <Container>
       <div
         className="d-flex flex-row"
         style={{
@@ -37,12 +38,12 @@ export default function Platos(props: Props): ReactElement {
         </Link>
       </div>
 
-      <table className="mt-3 table table-hover">
+      <table className=" table table-hover">
         <thead>
           <tr>
             <th>Plato</th>
             <th>Precio</th>
-            <th>Options</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -53,28 +54,57 @@ export default function Platos(props: Props): ReactElement {
               </td>
             </tr>
           )}
-          {platos?.map((item) => (
-            <tr key={item._id}>
-              <td style={{ alignItems: "center" }}>
-                <div className="d-flex">
-                  <div className="flex-shrink-0">
-                    <img src={item.imagen} alt={item.name} width="50" />
+          {platos?.map((item) => {
+            return (
+              <tr key={item._id}>
+                <td>
+                  <div className="d-flex">
+                    <div className="flex-shrink-0">
+                      <img src={item.imagen} alt={item.name} width="50" />
+                    </div>
+                    <div className=" ms-3">{item.name}</div>
                   </div>
-                  <div className=" ms-3">{item.name}</div>
-                </div>
-              </td>
-              <td>${item.price}</td>
-              <td>
-                <div >
-                  <Link className="btn btn-warning mx-2" to={`/platos/edit/${item._id}`}>Editar</Link>
-                   
-                   <Button variant="danger" className="mx-2" >Eliminar</Button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>${item.price}</td>
+                <td className="text-end">
+                  <p>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>
+                          <strong>Editar</strong>
+                        </Tooltip>
+                      }
+                      children={
+                        <Link
+                          className="btn btn-warning"
+                          to={`/platos/edit/${item._id}`}
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title="Editar"
+                        >
+                          <FaEdit />
+                        </Link>
+                      }
+                    ></OverlayTrigger>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>
+                          <strong>Eliminar</strong>
+                        </Tooltip>
+                      }
+                      children={
+                        <Button variant="danger" style={{ marginLeft: 10 }}>
+                          <FaTrashAlt />
+                        </Button>
+                      }
+                    ></OverlayTrigger>
+                  </p>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-    </div>
+    </Container>
   );
 }

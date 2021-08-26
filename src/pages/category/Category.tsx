@@ -5,6 +5,7 @@ import { BASE_URL } from "../../config";
 import { ICategory } from "../../models/Category";
 import Loading from "../../components/Loading";
 import Confirm from "../../components/Confirm";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 interface Props {}
 
@@ -78,7 +79,7 @@ export default function Category({}: Props): ReactElement {
           <thead>
             <tr >
               <th >Categoria</th>
-              <th>Opciones</th>
+              <th className="align-content-end"></th>
             </tr>
           </thead>
           <tbody>
@@ -93,15 +94,17 @@ export default function Category({}: Props): ReactElement {
               <tr key={i}>
                 <td >{x.name}</td>
                 <td>
+                  <p className="text-end">
                     <Link
                       to={`/category/edit/${x._id}`}
                       className="mx-2 btn btn-warning"
                     >
-                      Editar
+                      <FaEdit/>
                     </Link>
                     <Button variant="danger" onClick={() => hanfleEliminar(x._id)}>
-                      Eliminar
+                      <FaTrashAlt/>
                     </Button>
+                    </p>
                 </td>
               </tr>
             ))}

@@ -1,9 +1,11 @@
+import { realpathSync } from "fs";
 import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
-import {Button} from "react-bootstrap";
-import { useParams, useRouteMatch } from "react-router";
+import { Button } from "react-bootstrap";
+import { useHistory, useParams, useRouteMatch } from "react-router";
 import { Link } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { BASE_URL } from "../../config/index";
+import Category from "./Category";
 
 interface Props {}
 interface IParams {
@@ -21,7 +23,10 @@ export default function CreateEditCategory({}: Props): ReactElement {
   });
   const [url, setUrl] = useState(`${BASE_URL}/api/category/${id ? id : ""}`);
   const [loading, setLoading] = useState(true);
+  const [nameInvalid, setNameInvalid] = useState(false);
+  const history = useHistory();
   useEffect(() => {
+     
     if (!id) return setLoading(false);
     fetch(url)
       .then(async (result) => {
@@ -32,6 +37,7 @@ export default function CreateEditCategory({}: Props): ReactElement {
   }, []);
   async function save(e: any) {
     e.preventDefault();
+    if (!category.name) return setNameInvalid(true);
     if (!id) {
       // create
       const result = await fetch(url, {
@@ -42,7 +48,7 @@ export default function CreateEditCategory({}: Props): ReactElement {
         body: JSON.stringify({ name: category.name }),
       });
       if (result) alert("success");
-      return;
+      return history.push("/category");
     }
     const result = await fetch(url, {
       method: "PUT",
@@ -52,7 +58,7 @@ export default function CreateEditCategory({}: Props): ReactElement {
       body: JSON.stringify(category),
     });
     if (result) alert("success");
-    // update
+    history.push("/category");
   }
   return (
     <div className="container mt-3">
@@ -66,17 +72,26 @@ export default function CreateEditCategory({}: Props): ReactElement {
               <label className="form-label">Nombre</label>
               <input
                 type="text"
-                className="form-control"
+                className={"form-control " + `${nameInvalid && "is-danger"}`}
                 value={category?.name}
-                onChange={(event: ChangeEvent<HTMLInputElement>): void =>
-                  setCategory({ ...category, name: event.target.value })
-                }
+                onChange={({ target }: ChangeEvent<HTMLInputElement>): void => {
+                  const { value } = target;
+                  setCategory({ ...category, name: value });
+                  if (value !== "") return setNameInvalid(false);
+                  return setNameInvalid(true);
+                }}
               />
+              {nameInvalid && (
+                <div className="form-text text-danger">
+                  Este campo es requerido.
+                </div>
+              )}
             </div>
             <div className="">
-              <Button type="submit" variant="primary">Guardar</Button>
+              <Button type="submit" variant="primary" disabled={nameInvalid}>
+                Guardar
+              </Button>
               <Link to="/category" className="btn btn-success mx-2">
-                {" "}
                 Volver atrás
               </Link>
             </div>

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import MenuCard from "../components/MenuCard";
 import { IMenu } from "../models/Menu";
 import { BASE_URL } from "../config";
-import Loading from '../components/Loading';
+import Loading from "../components/Loading";
+import { Container } from "react-bootstrap";
 
 const Home = () => {
   const [menu, setMenu] = useState<IMenu[]>();
@@ -12,20 +13,20 @@ const Home = () => {
     fetch(url)
       .then(async (result) => {
         setMenu(await result.json());
-        setLoading(false)
+        setLoading(false);
       })
       .catch((err) => console.error(err));
   }, []);
   return (
-    <div className="container pt-3">
+    <Container>
       <div className="row">
         <h1>Comidas</h1>
       </div>
 
       <div className="row">
-        {loading?(
+        {loading ? (
           <Loading />
-        ): (
+        ) : (
           menu?.map(({ _id, name, price, rate, imagen }) => (
             <div
               className="col p-2 link-dark"
@@ -45,9 +46,9 @@ const Home = () => {
               />
             </div>
           ))
-        )  }
+        )}
       </div>
-    </div>
+    </Container>
   );
 };
 

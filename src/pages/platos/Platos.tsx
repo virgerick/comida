@@ -5,13 +5,20 @@ import Loading from "../../components/Loading";
 import { BASE_URL } from "../../config";
 import { IMenu } from "../../models/Menu";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import Confirm from "../../components/Confirm";
 interface Props {}
 
 export default function Platos(props: Props): ReactElement {
   const [platos, setPlatos] = useState<IMenu[]>();
   const [loading, setLoading] = useState(true);
+  const [idToDelete, setIdToDelete] = useState(null);
+  const [confirmProps, setConfirmProps] = useState({
+    visible: false,
+    title: "Confirmar",
+    message: "Segurio de eliminar esta plato?",
+  });
+  const url: string = `${BASE_URL}/api/platos`;
   useEffect(() => {
-    const url: string = `${BASE_URL}/api/platos`;
     fetch(url)
       .then(async (result) => {
         setPlatos(await result.json());
@@ -19,8 +26,37 @@ export default function Platos(props: Props): ReactElement {
       })
       .catch((err) => console.error(err));
   }, []);
+  const hanfleEliminar = (id: any) => {
+    setConfirmProps({ ...confirmProps, visible: true });
+    setIdToDelete(id);
+  };
+  const onCloseConfirm = () => {
+    setConfirmProps({ ...confirmProps, visible: false });
+    setIdToDelete(null);
+  };
+  const onEliminarConfirm = () => {
+    eliminar(idToDelete);
+  };
+  async function eliminar(id: any) {
+    const result = await fetch(`${url}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const platoFiltered = platos?.filter((x) => x._id !== id);
+    setPlatos(platoFiltered);
+  }
+
   return (
     <Container>
+      <Confirm
+        visible={confirmProps.visible}
+        title={confirmProps.title}
+        message={confirmProps.message}
+        onConfirm={onEliminarConfirm}
+        onClose={onCloseConfirm}
+      />
       <div
         className="d-flex flex-row"
         style={{
@@ -93,7 +129,9 @@ export default function Platos(props: Props): ReactElement {
                         </Tooltip>
                       }
                       children={
-                        <Button variant="danger" style={{ marginLeft: 10 }}>
+                        <Button variant="danger"
+                        onClick={()=>hanfleEliminar(item._id)}
+                         style={{ marginLeft: 10 }}>
                           <FaTrashAlt />
                         </Button>
                       }
